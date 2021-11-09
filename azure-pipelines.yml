@@ -3,21 +3,30 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
-trigger:
-- main
+trigger: none
 
-pool:
-  vmImage: ubuntu-latest
+resources:
+  repositories:
+  - repository: self
+    type: git
+    ref: main
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
-
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
-- task: Docker@2
-  inputs:
-    command: 'buildAndPush'
-    Dockerfile: '**/Dockerfile'
+stages:
+- stage: test
+  jobs:
+  - deployment: Test
+    displayName: Test
+    environment:
+      name: magento_local
+      resourceType: VirtualMachine
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: CmdLine@2
+            displayName: "test lines"
+            inputs:
+              script: >-
+                echo "No line"
+                echo "Is needed"
+   
