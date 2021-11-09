@@ -26,7 +26,7 @@ stages:
           - task: CmdLine@2
             displayName: "test lines"
             inputs:
-              script: >-
+              script: |
                 echo "No line"
                 echo "Is needed"
    
