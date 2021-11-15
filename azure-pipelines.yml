@@ -18,9 +18,9 @@ parameters:
     
 
 stages:
-- stage: Deploy
+- stage: DeployEnv
   jobs:
-  - deployment: Deploy
+  - deployment: DeployEnv
     displayName: Deploy code
     environment:
       name: magento_local
