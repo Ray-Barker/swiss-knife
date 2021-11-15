@@ -34,7 +34,7 @@ stages:
             inputs:
               script: |
                 cd /home/vagrant/${{ parameters.branch }}/magento-base
-                [[ "${{ parameters.branch }}" == "a11y"]] && git checkout UserStory-accessibility-epam
+                [[ "${{ parameters.branch }}" == "a11y" ]] && git checkout UserStory-accessibility-epam
                 if [[ "${{ parameters.branch }}" == "jp"]]; then git checkout jp/dev; cd packages/magento2-jp; git checkout dev/magento-2.4.2-compatibility; fi
                 git reset --hard
                 git pull
