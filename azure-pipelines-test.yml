@@ -25,10 +25,6 @@ stages:
   jobs:
   - job: Testing
     displayName: Test the checks
-    pool:
-      name: epam
-      demands:
-      - Agent.Name -equals linuxagent01
     workspace:
       clean: all
     steps:
