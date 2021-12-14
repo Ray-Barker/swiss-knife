@@ -1,18 +1,16 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
+variables:
+  isTestA: $[eq(variables['Build.SourceBranch'], 'refs/heads/testjp')]
 
 trigger:
   branches:
     include:
-    - main
+    - testjp 
 
 resources:
   repositories:
   - repository: self
     type: git
-    ref: main
+    ref: testjp
 
 parameters:
   - name: branch

@@ -1,17 +1,17 @@
 variables:
-  isTestA: $[eq(variables['Build.SourceBranch'], 'refs/heads/test-a')]
+  isTestA: $[eq(variables['Build.SourceBranch'], 'refs/heads/test')]
 
 
 trigger:
   branches:
     include:
-    - main
+    - test
 
 resources:
   repositories:
   - repository: self
     type: git
-    ref: main
+    ref: test
 
 parameters:
   - name: branch
