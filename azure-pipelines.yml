@@ -3,7 +3,10 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
-trigger: none
+trigger:
+  branches:
+    include:
+    - test-a
 
 resources:
   repositories:
@@ -18,6 +21,26 @@ parameters:
     
 
 stages:
+- stage: Build
+  jobs:
+  - job: Testing
+    displayName: Test the checks
+    pool:
+      name: epam
+      demands:
+      - Agent.Name -equals linuxagent01
+    workspace:
+      clean: all
+    steps:
+    - checkout: self
+      clean: true
+    - task: Bash@3
+      displayName: docker login        
+      inputs:
+        targetType: 'inline'
+        script: |            
+          echo "Testing checks"
+
 - stage: DeployEnv
   jobs:
   - deployment: DeployEnv
