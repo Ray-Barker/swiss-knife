@@ -42,6 +42,7 @@ stages:
           echo "Testing checks"
 
 - stage: DeployEnv
+  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
   jobs:
   - deployment: DeployEnv
     displayName: Deploy code
