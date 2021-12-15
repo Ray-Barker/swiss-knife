@@ -34,7 +34,7 @@ stages:
       inputs:
         targetType: 'inline'
         script: |            
-          echo "Testing checks"
+          echo "Testing checks for $(Build.SourceBranch)"
 
 - stage: DeployEnv
   condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
