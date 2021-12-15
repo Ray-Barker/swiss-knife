@@ -20,6 +20,7 @@ parameters:
 
 stages:
 - stage: Build
+  condition: eq(variables.isTestA, 'true')
   jobs:
   - job: Testing
     displayName: Test the checks
@@ -29,11 +30,11 @@ stages:
     - checkout: self
       clean: true
     - task: Bash@3
-      displayName: docker login        
+      displayName: Test task
       inputs:
         targetType: 'inline'
         script: |            
-          echo "Testing checks"
+          echo "Testing checks with branch $(Build.SourceBranch)"
 
 - stage: DeployEnv
   condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
