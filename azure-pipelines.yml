@@ -1,7 +1,6 @@
 variables:
   isTestA: $[eq(variables['Build.SourceBranch'], 'refs/heads/test')]
 
-
 trigger:
   branches:
     include:
