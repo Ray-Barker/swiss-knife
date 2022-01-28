@@ -85,8 +85,13 @@ stages:
             inputs:
               script: |
                 cd /var/www/${{ parameters.branch }}-$(Build.BuildNumber)
-                #sudo su magento -c "php bin/magento setup:install --base-url=http://${{ parameters.branch }}.172.30.1.10.nip.io/ --db-host=localhost:3306 --db-name=${{ parameters.branch }} --db-user=root --db-password=P@ssw0rd --admin-firstname=Magento --admin-lastname=User --admin-email=user@nike.com --admin-user=administrator --admin-password=admin123 --backend-frontname=admin --language=en_US --currency=USD --timezone=America/Los_Angeles --use-rewrites=1 --search-engine=elasticsearch7 --elasticsearch-host=localhost --elasticsearch-port=9200"
+                function magento_maintenance_mode {
+                sudo su magento -c "php bin/magento \"maintenance:${mode}\"")
+                }
+                magento_maintenance_mode enable
                 sudo su magento -c "php bin/magento setup:upgrade --no-interaction"
-                sudo su magento -c "php bin/magento c:c"
+                sudo su magento -c "php bin/magento c:f"
+                sudo su magento -c "php bin/magento in:rein"
                 sudo rm -rf /var/www/${{ parameters.branch }}
                 sudo ln -f -s /var/www/${{ parameters.branch }}-$(Build.BuildNumber) /var/www/${{ parameters.branch }}
+                magento_maintenance_mode disable
