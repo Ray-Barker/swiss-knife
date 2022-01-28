@@ -54,10 +54,10 @@ stages:
             inputs:
               script: |
                 cd /home/vagrant/jp/magento-base
-                if [[ "${{ parameters.branch }}" == "a11y" ]]; then git checkout jp/dev-accessibility; cd packages/magento2-jp; git checkout dev/magento-2.4.2-compatibility; fi
-                if [[ "${{ parameters.branch }}" == "jp" ]]; then git checkout jp/dev; cd packages/magento2-jp; git checkout dev/magento-2.4.2-compatibility; fi
-                git reset --hard
-                git pull
+                if [[ "${{ parameters.branch }}" == "a11y" ]]; then sudo su magento -c "git checkout jp/dev-accessibility; cd packages/magento2-jp; git checkout dev/magento-2.4.2-compatibility"; fi
+                if [[ "${{ parameters.branch }}" == "jp" ]]; then sudo su magento -c "git checkout jp/dev; cd packages/magento2-jp; git checkout dev/magento-2.4.2-compatibility"; fi
+                sudo su magento -c "git reset --hard"
+                sudo su magento -c "git pull"
           - task: CmdLine@2
             displayName: "Create folder"
             inputs:
@@ -85,3 +85,4 @@ stages:
                 #sudo su magento -c "php bin/magento setup:install --base-url=http://${{ parameters.branch }}.172.30.1.10.nip.io/ --db-host=localhost:3306 --db-name=${{ parameters.branch }} --db-user=root --db-password=P@ssw0rd --admin-firstname=Magento --admin-lastname=User --admin-email=user@nike.com --admin-user=administrator --admin-password=admin123 --backend-frontname=admin --language=en_US --currency=USD --timezone=America/Los_Angeles --use-rewrites=1 --search-engine=elasticsearch7 --elasticsearch-host=localhost --elasticsearch-port=9200"
                 sudo su magento -c "php bin/magento setup:upgrade --no-interaction; php bin/magento weltpixel:cleanup; php bin/magento weltpixel:less:generate"
                 sudo su magento -c "php bin/magento c:c"
+                sudo ln -f -s /var/www/${{ parameters.branch }}-$(Build.BuildNumber) /var/www/${{ parameters.branch }}
