@@ -90,7 +90,7 @@ stages:
                 sudo su magento -c "php bin/magento \"maintenance:${mode}\""
                 }
                 magento_maintenance_mode enable
-                sudo su magento -c "php bin/magento setup:upgrade --no-interaction"
+                sudo su magento -c "php bin/magento setup:upgrade --keep-generated --no-interaction"
                 sudo su magento -c "php bin/magento c:f"
                 sudo su magento -c "php bin/magento in:rein"
                 sudo rm -rf /var/www/${{ parameters.branch }}
