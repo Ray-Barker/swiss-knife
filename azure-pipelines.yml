@@ -63,7 +63,7 @@ stages:
             displayName: "Create folder"
             inputs:
               script: |
-                sudo mkdir /var/www/${{ parameters.branch }}-releases/$(Build.BuildNumber)
+                sudo mkdir -p /var/www/${{ parameters.branch }}-releases/$(Build.BuildNumber)
                 sudo cp -r /home/vagrant/jp/magento-base/* /var/www/${{ parameters.branch }}-releases/$(Build.BuildNumber)/
                 sudo rm -rf /var/www/${{ parameters.branch }}-releases/$(Build.BuildNumber)/pub/media
                 sudo ln -s -f /var/www/media /var/www/${{ parameters.branch }}-releases/$(Build.BuildNumber)/pub/
