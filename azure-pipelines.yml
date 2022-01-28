@@ -65,6 +65,7 @@ stages:
               script: |
                 sudo mkdir /var/www/${{ parameters.branch }}-$(Build.BuildNumber)
                 sudo cp -r /home/vagrant/jp/magento-base/* /var/www/${{ parameters.branch }}-$(Build.BuildNumber)/
+                sudo rm -rf /var/www/${{ parameters.branch }}-$(Build.BuildNumber)/pub/media
                 sudo ln -s -f /var/www/media /var/www/${{ parameters.branch }}-$(Build.BuildNumber)/pub/
                 sudo ln -s -f /var/www/shared/${{ parameters.branch }}/env.php /var/www/${{ parameters.branch }}-$(Build.BuildNumber)/app/etc/
                 sudo chown -R magento:www-data /var/www/${{ parameters.branch }}-$(Build.BuildNumber)
@@ -83,7 +84,9 @@ stages:
             displayName: "Upgrade"
             inputs:
               script: |
+                cd /var/www/${{ parameters.branch }}-$(Build.BuildNumber)
                 #sudo su magento -c "php bin/magento setup:install --base-url=http://${{ parameters.branch }}.172.30.1.10.nip.io/ --db-host=localhost:3306 --db-name=${{ parameters.branch }} --db-user=root --db-password=P@ssw0rd --admin-firstname=Magento --admin-lastname=User --admin-email=user@nike.com --admin-user=administrator --admin-password=admin123 --backend-frontname=admin --language=en_US --currency=USD --timezone=America/Los_Angeles --use-rewrites=1 --search-engine=elasticsearch7 --elasticsearch-host=localhost --elasticsearch-port=9200"
-                sudo su magento -c "php bin/magento setup:upgrade --no-interaction; php bin/magento weltpixel:cleanup; php bin/magento weltpixel:less:generate"
+                sudo su magento -c "php bin/magento setup:upgrade --no-interaction"
                 sudo su magento -c "php bin/magento c:c"
+                sudo rm -rf /var/www/${{ parameters.branch }}
                 sudo ln -f -s /var/www/${{ parameters.branch }}-$(Build.BuildNumber) /var/www/${{ parameters.branch }}
