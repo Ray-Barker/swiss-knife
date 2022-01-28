@@ -54,10 +54,11 @@ stages:
             inputs:
               script: |
                 cd /home/vagrant/jp/magento-base
-                if [[ "${{ parameters.branch }}" == "a11y" ]]; then sudo su magento -c "git checkout jp/dev-accessibility; cd packages/magento2-jp; git checkout dev/magento-2.4.2-compatibility"; fi
-                if [[ "${{ parameters.branch }}" == "jp" ]]; then sudo su magento -c "git checkout jp/dev; cd packages/magento2-jp; git checkout dev/magento-2.4.2-compatibility"; fi
-                sudo su magento -c "git reset --hard"
-                sudo su magento -c "git pull"
+                function git_init {
+                sudo su magento -c "git checkout $branch && git reset --hard origin/$branch && git pull && git submodule init && git submodule update && cd packages/magento2-jp && git checkout dev/magento-2.4.2-compatibility" 
+                }
+                if [[ "${{ parameters.branch }}" == "a11y" ]]; then branch="jp/dev/accessibility" git_init; fi
+                if [[ "${{ parameters.branch }}" == "jp" ]]; then sbranch="jp/dev" git_init; fi
           - task: CmdLine@2
             displayName: "Create folder"
             inputs:
