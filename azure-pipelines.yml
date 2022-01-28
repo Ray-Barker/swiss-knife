@@ -86,7 +86,7 @@ stages:
               script: |
                 cd /var/www/${{ parameters.branch }}-$(Build.BuildNumber)
                 function magento_maintenance_mode {
-                sudo su magento -c "php bin/magento \"maintenance:${mode}\"")
+                sudo su magento -c "php bin/magento \"maintenance:${mode}\""
                 }
                 magento_maintenance_mode enable
                 sudo su magento -c "php bin/magento setup:upgrade --no-interaction"
