@@ -86,6 +86,7 @@ stages:
               script: |
                 cd /var/www/${{ parameters.branch }}-$(Build.BuildNumber)
                 function magento_maintenance_mode {
+                local mode=$1
                 sudo su magento -c "php bin/magento \"maintenance:${mode}\""
                 }
                 magento_maintenance_mode enable
