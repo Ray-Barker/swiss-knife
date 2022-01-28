@@ -63,17 +63,17 @@ stages:
             displayName: "Create folder"
             inputs:
               script: |
-                sudo mkdir /var/www/${{ parameters.branch }}-$(Build.BuildNumber)
-                sudo cp -r /home/vagrant/jp/magento-base/* /var/www/${{ parameters.branch }}-$(Build.BuildNumber)/
-                sudo rm -rf /var/www/${{ parameters.branch }}-$(Build.BuildNumber)/pub/media
-                sudo ln -s -f /var/www/media /var/www/${{ parameters.branch }}-$(Build.BuildNumber)/pub/
-                sudo ln -s -f /var/www/shared/${{ parameters.branch }}/env.php /var/www/${{ parameters.branch }}-$(Build.BuildNumber)/app/etc/
+                sudo mkdir /var/www/${{ parameters.branch }}-releases/$(Build.BuildNumber)
+                sudo cp -r /home/vagrant/jp/magento-base/* /var/www/${{ parameters.branch }}-releases/$(Build.BuildNumber)/
+                sudo rm -rf /var/www/${{ parameters.branch }}-releases/$(Build.BuildNumber)/pub/media
+                sudo ln -s -f /var/www/media /var/www/${{ parameters.branch }}-releases/$(Build.BuildNumber)/pub/
+                sudo ln -s -f /var/www/shared/${{ parameters.branch }}/env.php /var/www/${{ parameters.branch }}-releases/$(Build.BuildNumber)/app/etc/
                 sudo chown -R magento:www-data /var/www/${{ parameters.branch }}-$(Build.BuildNumber)
           - task: CmdLine@2
             displayName: "Build static"
             inputs:
               script: |
-                cd /var/www/${{ parameters.branch }}-$(Build.BuildNumber)
+                cd /var/www/${{ parameters.branch }}-releases/$(Build.BuildNumber)
                 sudo su magento -c "composer install --no-interaction"
                 sudo su magento -c "php bin/magento setup:di:compile --no-interaction"
                 sudo su magento -c "php bin/magento s:st:d en_US ja_JP -s compact -f"
@@ -84,7 +84,7 @@ stages:
             displayName: "Upgrade"
             inputs:
               script: |
-                cd /var/www/${{ parameters.branch }}-$(Build.BuildNumber)
+                cd /var/www/${{ parameters.branch }}-releases/$(Build.BuildNumber)
                 function magento_maintenance_mode {
                 local mode=$1
                 sudo su magento -c "php bin/magento \"maintenance:${mode}\""
@@ -94,5 +94,19 @@ stages:
                 sudo su magento -c "php bin/magento c:f"
                 sudo su magento -c "php bin/magento in:rein"
                 sudo rm -rf /var/www/${{ parameters.branch }}
-                sudo ln -f -s /var/www/${{ parameters.branch }}-$(Build.BuildNumber) /var/www/${{ parameters.branch }}
+                sudo ln -f -s /var/www/${{ parameters.branch }}-releases/$(Build.BuildNumber) /var/www/${{ parameters.branch }}
                 magento_maintenance_mode disable
+          - task: CmdLine@2
+            displayName: "Cleanup"
+            inputs:
+              script: |
+                cd /var/www/${{ parameters.branch }}-releases/
+                keep_releases=1
+                releases=$(ls -tr -d */)
+                RELEASES=($releases)
+                redundant_number=$(( ${#RELEASES[@]} - $keep_releases))
+                if (( $redundant_number > 0 )); then
+                  for ((i = 0 ; i < redundant_number ; i++)); do
+                      sudo rm -rf "${RELEASES[$i]}"
+                  done
+                fi
