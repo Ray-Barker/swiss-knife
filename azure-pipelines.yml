@@ -68,7 +68,7 @@ stages:
                 sudo rm -rf /var/www/${{ parameters.branch }}-releases/$(Build.BuildNumber)/pub/media
                 sudo ln -s -f /var/www/media /var/www/${{ parameters.branch }}-releases/$(Build.BuildNumber)/pub/
                 sudo ln -s -f /var/www/shared/${{ parameters.branch }}/env.php /var/www/${{ parameters.branch }}-releases/$(Build.BuildNumber)/app/etc/
-                sudo chown -R magento:www-data /var/www/${{ parameters.branch }}-$(Build.BuildNumber)
+                sudo chown -R magento:www-data /var/www/${{ parameters.branch }}-releases/$(Build.BuildNumber)
           - task: CmdLine@2
             displayName: "Build static"
             inputs:
