@@ -21,7 +21,6 @@ parameters:
 
 stages:
 - stage: Build
-  condition: eq(variables.isTestA, 'true')
   jobs:
   - job: Testing
     displayName: Test the checks
@@ -31,10 +30,10 @@ stages:
     - checkout: self
       clean: true
     - task: Bash@3
-      displayName: docker login        
+      displayName: docker login
       inputs:
         targetType: 'inline'
-        script: |            
+        script: |
           echo "Testing checks for $(Build.SourceBranch)"
 
 - stage: DeployEnv
