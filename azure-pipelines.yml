@@ -17,6 +17,9 @@ parameters:
   - name: branch
     type: string
     default: a11y
+    values:
+    - a11y
+    - jp
     
 
 stages:
