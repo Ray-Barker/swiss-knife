@@ -77,6 +77,9 @@ stages:
                 sudo su magento -c "composer install --no-interaction"
                 sudo su magento -c "php bin/magento setup:di:compile --no-interaction"
                 sudo su magento -c "php bin/magento s:st:d en_US ja_JP -s compact -f"
+                sudo su magento -c "php bin/magento weltpixel:less:generate"
+                sudo su magento -c "php bin/magento weltpixel:css:generate --store=the_van_jp_jp_store_view"
+                sudo su magento -c "php bin/magento weltpixel:css:generate --store=the_van_jp_en_store_view"
                 sudo chown -R magento:www-data .
                 sudo su magento -c "find var generated vendor pub/static pub/media app/etc -type f -exec chmod g+w {} +;"
                 sudo su magento -c "find var generated vendor pub/static pub/media app/etc -type d -exec chmod g+ws {} +;"
