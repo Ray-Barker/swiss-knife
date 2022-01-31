@@ -1,5 +1,10 @@
-variables:
-  isTestA: $[eq(variables['Build.SourceBranch'], 'refs/heads/test')]
+parameters:
+  - name: branch
+    type: string
+    default: a11y
+    values:
+    - a11y
+    - jp
 
 trigger:
   branches:
@@ -13,14 +18,6 @@ resources:
     ref: main
 
 name: 1.0$(rev:.r)
-parameters:
-  - name: branch
-    type: string
-    default: a11y
-    values:
-    - a11y
-    - jp
-    
 
 stages:
 - stage: Build
