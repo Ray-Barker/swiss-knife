@@ -58,7 +58,7 @@ stages:
                 sudo su magento -c "git checkout $branch && git reset --hard origin/$branch && git pull && git submodule init && git submodule update && cd packages/magento2-jp && git checkout dev/magento-2.4.2-compatibility" 
                 }
                 if [[ "${{ parameters.branch }}" == "a11y" ]]; then branch="jp/dev-accessibility" git_init; fi
-                if [[ "${{ parameters.branch }}" == "jp" ]]; then sbranch="jp/dev" git_init; fi
+                if [[ "${{ parameters.branch }}" == "jp" ]]; then branch="jp/dev" git_init; fi
           - task: CmdLine@2
             displayName: "Create folder"
             inputs:
