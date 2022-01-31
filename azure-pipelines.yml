@@ -34,7 +34,7 @@ stages:
       inputs:
         targetType: 'inline'
         script: |
-          echo "Testing checks for $(Build.SourceBranch)"
+          echo "The branch is ${{ parameters.branch }}"
 
 - stage: DeployEnv
   condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
@@ -63,6 +63,7 @@ stages:
             inputs:
               script: |
                 sudo mkdir -p /var/www/${{ parameters.branch }}-releases/$(Build.BuildNumber)
+                ls -la /var/www
                 sudo cp -r /home/vagrant/jp/magento-base/* /var/www/${{ parameters.branch }}-releases/$(Build.BuildNumber)/
                 sudo rm -rf /var/www/${{ parameters.branch }}-releases/$(Build.BuildNumber)/pub/media
                 sudo ln -s -f /var/www/media /var/www/${{ parameters.branch }}-releases/$(Build.BuildNumber)/pub/
