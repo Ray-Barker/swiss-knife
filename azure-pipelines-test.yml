@@ -26,4 +26,5 @@ stages:
       inputs:
         targetType: 'inline'
         script: |
-          echo "Testing checks with branch $(Build.SourceBranchName)"
+          echo "Testing envvar value: Build.SourceBranchName=$(Build.SourceBranchName)"
+          echo "Testing envvar value: Build.SourceBranch=$(Build.SourceBranch)"
