@@ -11,7 +11,6 @@ resources:
 
 stages:
 - stage: Build
-  condition: eq(variables.isTestA, 'true')
   jobs:
   - job: Testing
     displayName: Test the checks
