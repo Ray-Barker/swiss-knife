@@ -20,7 +20,7 @@ stages:
       inputs:
         targetType: 'inline'
         script: |
-          Write-Host "Triggered by BuildTriggeredByDefinitionName - $Build.TriggeredBy.DefinitionName"
+          Write-Host "Triggered by BuildTriggeredByDefinitionName - $(Build.TriggeredBy.DefinitionName)"
 
 # - stage: DeployEnv
 #   condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
