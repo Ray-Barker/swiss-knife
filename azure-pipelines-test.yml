@@ -1,72 +1,58 @@
-variables:
-  isTestA: $[eq(variables['Build.SourceBranch'], 'refs/heads/testjp')]
-
-trigger:
-  branches:
-    include:
-    - testjp 
-
 resources:
-  repositories:
-  - repository: self
-    type: git
-    ref: testjp
-
-parameters:
-  - name: branch
-    type: string
-    default: a11y
-    
+  pipelines:
+  - pipeline: Another_project-CI
+    source: Another_project-CI
+    project: Another_project
+    trigger:
+      stages:         # This stage filter is used when evaluating conditions for 
+      - Stage_1 # triggering your pipeline. On successful completion of all the stages
 
 stages:
 - stage: Build
-  condition: eq(variables.isTestA, 'true')
   jobs:
   - job: Testing
     displayName: Test the checks
     workspace:
       clean: all
     steps:
-    - checkout: self
-      clean: true
-    - task: Bash@3
+    - task: PowerShell@2
       displayName: Test task
       inputs:
         targetType: 'inline'
-        script: |            
-          echo "Testing checks with branch $(Build.SourceBranch)"
+        script: |
+          Write-Host "Triggered by BuildTriggeredByDefinitionName - $Build.TriggeredBy.DefinitionName"
 
-- stage: DeployEnv
-  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
-  jobs:
-  - deployment: DeployEnv
-    displayName: Deploy code
-    environment:
-      name: magento_local
-      resourceType: VirtualMachine
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - task: CmdLine@2
-            displayName: "Deploy script"
-            inputs:
-              script: |
-                cd /home/vagrant/${{ parameters.branch }}/magento-base
-                [[ "${{ parameters.branch }}" == "a11y" ]] && git checkout UserStory-accessibility-epam
-                if [[ "${{ parameters.branch }}" == "jp" ]]; then git checkout jp/dev; cd packages/magento2-jp; git checkout dev/magento-2.4.2-compatibility; fi
-                git reset --hard
-                git pull
-                sudo ln -s /home/vagrant/${{ parameters.branch }}/magento-base /var/www/${{ parameters.branch }}
-                sudo cp -r /home/vagrant/media/* /var/www/${{ parameters.branch }}/pub/media/
-                sudo chown -R magento:www-data /var/www/${{ parameters.branch }}
-                cd /var/www/${{ parameters.branch }}
-                sudo chown -R magento:www-data .
-                sudo su magento -c "composer install --no-interaction"
-                sudo su magento -c "php bin/magento setup:install --base-url=http://${{ parameters.branch }}.172.30.1.10.nip.io/ --db-host=localhost:3306 --db-name=${{ parameters.branch }} --db-user=root --db-password=P@ssw0rd --admin-firstname=Magento --admin-lastname=User --admin-email=user@nike.com --admin-user=administrator --admin-password=admin123 --backend-frontname=admin --language=en_US --currency=USD --timezone=America/Los_Angeles --use-rewrites=1 --search-engine=elasticsearch7 --elasticsearch-host=localhost --elasticsearch-port=9200"
-                sudo su magento -c "php bin/magento setup:upgrade --no-interaction; php bin/magento weltpixel:cleanup; php bin/magento weltpixel:less:generate"
-                sudo su magento -c "php bin/magento setup:di:compile --no-interaction"
-                sudo su magento -c "php bin/magento c:c"
-                sudo su magento -c "find var generated vendor pub/static pub/media app/etc -type f -exec chmod g+w {} +;"
-                sudo su magento -c "find var generated vendor pub/static pub/media app/etc -type d -exec chmod g+ws {} +;"
+# - stage: DeployEnv
+#   condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+#   jobs:
+#   - deployment: DeployEnv
+#     displayName: Deploy code
+#     environment:
+#       name: magento_local
+#       resourceType: VirtualMachine
+#     strategy:
+#       runOnce:
+#         deploy:
+#           steps:
+#           - task: CmdLine@2
+#             displayName: "Deploy script"
+#             inputs:
+#               script: |
+#                 cd /home/vagrant/${{ parameters.branch }}/magento-base
+#                 [[ "${{ parameters.branch }}" == "a11y" ]] && git checkout UserStory-accessibility-epam
+#                 if [[ "${{ parameters.branch }}" == "jp" ]]; then git checkout jp/dev; cd packages/magento2-jp; git checkout dev/magento-2.4.2-compatibility; fi
+#                 git reset --hard
+#                 git pull
+#                 sudo ln -s /home/vagrant/${{ parameters.branch }}/magento-base /var/www/${{ parameters.branch }}
+#                 sudo cp -r /home/vagrant/media/* /var/www/${{ parameters.branch }}/pub/media/
+#                 sudo chown -R magento:www-data /var/www/${{ parameters.branch }}
+#                 cd /var/www/${{ parameters.branch }}
+#                 sudo chown -R magento:www-data .
+#                 sudo su magento -c "composer install --no-interaction"
+#                 sudo su magento -c "php bin/magento setup:install --base-url=http://${{ parameters.branch }}.172.30.1.10.nip.io/ --db-host=localhost:3306 --db-name=${{ parameters.branch }} --db-user=root --db-password=P@ssw0rd --admin-firstname=Magento --admin-lastname=User --admin-email=user@nike.com --admin-user=administrator --admin-password=admin123 --backend-frontname=admin --language=en_US --currency=USD --timezone=America/Los_Angeles --use-rewrites=1 --search-engine=elasticsearch7 --elasticsearch-host=localhost --elasticsearch-port=9200"
+#                 sudo su magento -c "php bin/magento setup:upgrade --no-interaction; php bin/magento weltpixel:cleanup; php bin/magento weltpixel:less:generate"
+#                 sudo su magento -c "php bin/magento setup:di:compile --no-interaction"
+#                 sudo su magento -c "php bin/magento c:c"
+#                 sudo su magento -c "find var generated vendor pub/static pub/media app/etc -type f -exec chmod g+w {} +;"
+#                 sudo su magento -c "find var generated vendor pub/static pub/media app/etc -type d -exec chmod g+ws {} +;"
                 
