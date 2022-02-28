@@ -3,9 +3,9 @@ resources:
   - pipeline: Another_project-CI
     source: Another_project-CI
     project: Another_project
-    trigger: true
-#      stages:         # This stage filter is used when evaluating conditions for 
-#      - Stage_1 # triggering your pipeline. On successful completion of all the stages
+    trigger:
+      stages:         # This stage filter is used when evaluating conditions for 
+      - Stage_1# triggering your pipeline. On successful completion of all the stages
 
 stages:
 - stage: Build
