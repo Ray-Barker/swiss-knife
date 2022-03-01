@@ -1,3 +1,11 @@
+parameters:
+- name: stage
+  displayName: Stage
+  type: string
+  values:
+  - Stage_1
+  - Stage_2
+
 resources:
   pipelines:
   - pipeline: Another_project-CI
@@ -5,7 +13,7 @@ resources:
     project: Another_project
     trigger:
       stages:         # This stage filter is used when evaluating conditions for 
-      - Stage_1# triggering your pipeline. On successful completion of all the stages
+      - ${{ parameters.stage }}
 
 stages:
 - stage: Build
