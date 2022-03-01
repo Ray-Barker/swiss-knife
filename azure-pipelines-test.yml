@@ -13,7 +13,7 @@ resources:
     project: Another_project
     trigger:
       stages:
-      - "${{ parameters.stage }}"
+      - ${{ parameters.stage }}
       
 
 stages:
