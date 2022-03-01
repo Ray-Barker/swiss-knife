@@ -12,8 +12,9 @@ resources:
     source: Another_project-CI
     project: Another_project
     trigger:
-      stages:         # This stage filter is used when evaluating conditions for 
-      - ${{ parameters.stage }}
+      stages:
+      - "${{ parameters.stage }}"
+      
 
 stages:
 - stage: Build
