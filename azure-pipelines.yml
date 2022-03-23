@@ -1,21 +1,15 @@
-parameters:
-  - name: branch
-    type: string
-    default: a11y
-    values:
-    - a11y
-    - jp
-
-trigger:
-  branches:
-    include:
-    - main
-
+trigger: none
 resources:
   repositories:
   - repository: self
     type: git
     ref: main
+
+parameters:
+- name: branch
+  displayName: Magento-base branch
+  type: string
+  default: jp/dev
 
 name: 1.0$(rev:.r)
 
@@ -27,14 +21,12 @@ stages:
     workspace:
       clean: all
     steps:
-    - checkout: self
-      clean: true
     - task: Bash@3
-      displayName: docker login
+      displayName: Just a step
       inputs:
         targetType: 'inline'
         script: |
-          echo "The branch is ${{ parameters.branch }}"
+          echo "Just a step"
 
 - stage: DeployEnv
   condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
@@ -52,32 +44,27 @@ stages:
             displayName: "Pull repo"
             inputs:
               script: |
-                cd /home/vagrant/jp/magento-base
-                function git_init {
-                sudo su magento -c "git checkout $branch && git reset --hard origin/$branch && git pull && git submodule init && git submodule update && cd packages/magento2-jp && git checkout dev/magento-2.4.2-compatibility" 
-                }
-                if [[ "${{ parameters.branch }}" == "a11y" ]]; then branch="jp/dev-accessibility" git_init; fi
-                if [[ "${{ parameters.branch }}" == "jp" ]]; then branch="jp/dev" git_init; fi
+                cd /var/www/repo
+                sudo git checkout $branch && sudo git pull
           - task: CmdLine@2
             displayName: "Create folder"
             inputs:
               script: |
-                sudo mkdir -p /var/www/${{ parameters.branch }}-releases/$(Build.BuildNumber)
-                ls -la /var/www
-                sudo cp -r /home/vagrant/jp/magento-base/* /var/www/${{ parameters.branch }}-releases/$(Build.BuildNumber)/
-                sudo rm -rf /var/www/${{ parameters.branch }}-releases/$(Build.BuildNumber)/pub/media
-                sudo ln -s -f /var/www/media /var/www/${{ parameters.branch }}-releases/$(Build.BuildNumber)/pub/
-                sudo ln -s -f /var/www/shared/${{ parameters.branch }}/env.php /var/www/${{ parameters.branch }}-releases/$(Build.BuildNumber)/app/etc/
-                sudo chown -R magento:www-data /var/www/${{ parameters.branch }}-releases/$(Build.BuildNumber)
+                sudo rm -rf /var/www/repo/pub/media
+                sudo cp -r /var/www/repo /var/www/releases/$(Build.BuildNumber)
+                sudo ln -s -f /var/www/media /var/www/releases/$(Build.BuildNumber)/pub/
+                sudo ln -s -f /var/www/env.php /var/www/releases/$(Build.BuildNumber)/app/etc/
+                sudo chown -R magento:www-data /var/www/releases/$(Build.BuildNumber)
           - task: CmdLine@2
             displayName: "Build static"
             inputs:
               script: |
-                cd /var/www/${{ parameters.branch }}-releases/$(Build.BuildNumber)
+                cd /var/www/releases/$(Build.BuildNumber)
                 sudo su magento -c "composer install --no-interaction"
                 sudo su magento -c "php bin/magento setup:di:compile --no-interaction"
-                sudo su magento -c "php bin/magento s:st:d -s compact -f"
-
+                sudo su magento -c "php bin/magento s:st:d -s compact -f --jobs=2"
+                sudo su magento -c "php bin/magento weltpixel:less:generate"
+                sudo su magento -c "php bin/magento weltpixel:css:generate --store=all"
                 sudo chown -R magento:www-data .
                 sudo su magento -c "find var generated vendor pub/static pub/media app/etc -type f -exec chmod g+w {} +;"
                 sudo su magento -c "find var generated vendor pub/static pub/media app/etc -type d -exec chmod g+ws {} +;"
@@ -85,7 +72,7 @@ stages:
             displayName: "Upgrade"
             inputs:
               script: |
-                cd /var/www/${{ parameters.branch }}-releases/$(Build.BuildNumber)
+                cd /var/www/releases/$(Build.BuildNumber)
                 function magento_maintenance_mode {
                 local mode=$1
                 sudo su magento -c "php bin/magento \"maintenance:${mode}\""
@@ -94,12 +81,9 @@ stages:
                 sudo su magento -c "php bin/magento setup:upgrade --keep-generated --no-interaction"
                 sudo su magento -c "php bin/magento c:f"
                 sudo su magento -c "php bin/magento in:rein"
-                sudo rm -rf /var/www/${{ parameters.branch }}
-                sudo ln -f -s /var/www/${{ parameters.branch }}-releases/$(Build.BuildNumber) /var/www/${{ parameters.branch }}
-                sudo su magento -c "php bin/magento weltpixel:less:generate"
-                sudo su magento -c "php bin/magento weltpixel:css:generate --store=the_van_jp_jp_store_view"
-                sudo su magento -c "php bin/magento weltpixel:css:generate --store=the_van_jp_en_store_view"
-                sudo chown -R magento:www-data .
+                sudo rm /var/www/html
+                sudo ln -f -s /var/www/releases/$(Build.BuildNumber) /var/www/html
+                sudo chown -R magento:www-data /var/www/html
                 sudo su magento -c "find var generated vendor pub/static pub/media app/etc -type f -exec chmod g+w {} +;"
                 sudo su magento -c "find var generated vendor pub/static pub/media app/etc -type d -exec chmod g+ws {} +;"
                 magento_maintenance_mode disable
@@ -107,7 +91,7 @@ stages:
             displayName: "Cleanup"
             inputs:
               script: |
-                cd /var/www/${{ parameters.branch }}-releases/
+                cd /var/www/releases/
                 keep_releases=1
                 releases=$(ls -tr -d */)
                 RELEASES=($releases)
