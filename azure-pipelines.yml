@@ -46,6 +46,7 @@ stages:
               script: |
                 cd /var/www/repo
                 sudo git checkout $branch && sudo git pull
+                sudo git submodule init && sudo submodule update
           - task: CmdLine@2
             displayName: "Create folder"
             inputs:
